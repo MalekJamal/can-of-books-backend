@@ -1,48 +1,37 @@
-'use strict';
+"use strict";
 
-require('dotenv').config();
-const express = require('express');
-const cors = require('cors');
+require("dotenv").config();
+const express = require("express");
+const cors = require("cors");
 const app = express();
 app.use(cors());
+app.use(express.json());
 
-const BookModel = require('./modules/booksDB');
+const BookModel = require("./modules/booksDB");
+const addNewBook = require("./modules/addNewBook");
+const deleteBook = require("./modules/deleteBook");
+const updateBook = require("./modules/updateBook");
+const books = require("./data");
 
 const PORT = process.env.PORT || 3001;
 
-app.get('/', (req, res) => {
-  res.send('Welcome to my Books server!')
-})
-
-
-
-const book1 = new BookModel({
-  title:"Clean Code",
-  description:"The clean code offers invaluable insights into code cleaning and software development. It has thorough, step-by-step explanations on cleaning, writing, and refactoring code...",
-  status:"Programming"
+app.get("/", (req, res) => {
+  res.send("Welcome to my Books server!");
 });
-const book2 = new BookModel({
-  title:"Design Patterns: Elements of Reusable Object-Oriented Software",
-  description:"Design Patterns are typical solutions to commonly occurring problems in software design. They are blueprints that you can customize to solve a particular ...",
-  status:"Software Design Patterns"
-});
-const book3 = new BookModel({
-  title:"User Stories Applied",
-  description:"User Stories Applied: For Agile Software Development is a book written by Mike Cohn. The book represents an effective means of gathering requirements from the customer...",
-  status:"Agile Software Development"
-});
+app.get("/books", handleBooks); // we should name the route without s, but here I'm follow the requirment
+app.post("/books", addNewBook);
+app.delete("/books/:id", deleteBook);
+app.put("/books/:id", updateBook); // to update existing record
 
-app.get('/books',handleBooks);
-
-function handleBooks(req,res){
-  
-  BookModel.find({},(error,data)=>{
-    error? console.log(`Erorr reading from the DataBase: ${error}`):res.send(data)
-  })
+// books.book1.save();
+// books.book2.save();
+// books.book3.save();
+function handleBooks(req, res) {
+  BookModel.find({}, (error, data) => {
+    error
+      ? console.log(`Erorr reading from the DataBase: ${error}`)
+      : res.send(data);
+  });
 }
 
-// Save to DataBase
-book1.save()
-book2.save()
-book3.save()
 app.listen(PORT, () => console.log(`listening on ${PORT}`));
